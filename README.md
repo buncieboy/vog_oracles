@@ -13,7 +13,7 @@ I have only ran on windows, not sure how it works on other MacOS/Linux. Let me k
 #### To use
 Set ATHEON constant to true if in Atheon room, false for oracles/templar. Run main.py. Your audio inputs will be listed numbered from 0 upwards, type the number for the audio input you want and press enter.
 
-You will need to modify the constants for better results. DECIBEL_CUTOFF helps to isolate background noise, but if too high it will prevent proper note detection. Debug modes will help with fine-tuning the constants.
+You will need to modify the constants for better results. DECIBEL_CUTOFF helps to isolate background noise, but if too high it will prevent proper note detection. Debug modes will help with fine-tuning the constants. Variables might need to change between rooms. I found I had to drop my decibel cutoff from 20 to 15 for Atheon.
 
 You can change the note_to_location function to modify the callouts you want to use. By default it uses 1-7 left to right for oracles, and far/close left/middle/right for Atheon.
 
