@@ -19,6 +19,8 @@ B_FLAT_MAX = 59.17
 QUEUE_LENGTH = 8
 NOTES_IN_QUEUE_REQUIRED = 5
 
+#constants for calculating the notes
+#these can be adjusted, but these defaults worked ok for me
 NOTE_MIN = 60
 NOTE_MAX = 69
 FSAMP = 22050
@@ -27,15 +29,23 @@ FRAMES_PER_FFT = 16
 SAMPLES_PER_FFT = FRAME_SIZE * FRAMES_PER_FFT
 FREQ_STEP = float(FSAMP) / SAMPLES_PER_FFT
 
+#ignore notes we don't care about
 if(ATHEON):
     NOTE_NAMES = 'C N D N E N F# G N A N N'.split()
 else:
     NOTE_NAMES = 'C N D N E N F# G N A Bb N'.split()
 
+#fancy math to calculate notes
 def freq_to_number(f): return 69 + 12 * np.log2(f / 440.0)
 def number_to_freq(n): return 440 * 2.0 ** ((n - 69) / 12.0)
 def note_name(n): return NOTE_NAMES[n % 12]
+def note_to_fftbin(n): return number_to_freq(n) / FREQ_STEP
+imin = max(0, int(np.floor(note_to_fftbin(NOTE_MIN - 1))))
+imax = min(SAMPLES_PER_FFT, int(np.ceil(note_to_fftbin(NOTE_MAX + 1))))
+buf = np.zeros(SAMPLES_PER_FFT, dtype=np.float32)
+num_frames = 0
 
+#change the return messages to different call outs if you wish
 def note_to_location(n):
     if (n == "A"): return "far left, " if ATHEON else "1"
     if (n == "F#"): return "close middle, " if ATHEON else "2"
@@ -45,12 +55,7 @@ def note_to_location(n):
     if (n == "G"): return "close left, " if ATHEON else "6"
     if (n == "Bb"): return "ERROR " if ATHEON else "7"
 
-def note_to_fftbin(n): return number_to_freq(n) / FREQ_STEP
-imin = max(0, int(np.floor(note_to_fftbin(NOTE_MIN - 1))))
-imax = min(SAMPLES_PER_FFT, int(np.ceil(note_to_fftbin(NOTE_MAX + 1))))
-buf = np.zeros(SAMPLES_PER_FFT, dtype=np.float32)
-num_frames = 0
-
+#print audio inputs, have user choose audio source
 p = pyaudio.PyAudio()
 info = p.get_host_api_info_by_index(0)
 numdevices = info.get('deviceCount')
@@ -67,23 +72,29 @@ stream = pyaudio.PyAudio().open(format=pyaudio.paInt16,
 stream.start_stream()
 window = 0.5 * (1 - np.cos(np.linspace(0, 2 * np.pi, SAMPLES_PER_FFT, False)))
 
+#variables used for note detection/printing
 last_printed_note = None
 samples_without_char = 0
 sequence = collections.deque(QUEUE_LENGTH * [""], QUEUE_LENGTH)
 
+#main loop
 while stream.is_active():
     samples_without_char += 1
+    #this can be adjusted if you want it to print new lines quicker/slower
     if samples_without_char == 35 or samples_without_char == 100:
         last_printed_note = None
         print("")
+    #more fancy maths
     buf[:-FRAME_SIZE] = buf[FRAME_SIZE:]
     buf[-FRAME_SIZE:] = np.fromstring(stream.read(FRAME_SIZE), np.int16)
     fft = np.fft.rfft(buf * window)
     s_mag = np.abs(fft) * 2 / np.sum(window)
     s_dbfs = (20 * np.log10((s_mag / 32768))) + 120
     decibel = (sum(s_dbfs) / len(s_dbfs))
+    #ignore notes that are too quiet (helps with any background audio)
     if ((sum(s_dbfs) / len(s_dbfs)) < DECIBEL_CUTOFF):
         continue
+    #calculate freq and note
     freq = (np.abs(fft[imin:imax]).argmax() + imin) * FREQ_STEP
     n = freq_to_number(freq)
     n0 = int(round(n))
@@ -93,14 +104,19 @@ while stream.is_active():
     if num_frames >= FRAMES_PER_FFT:
         if (DEBUG == 1):
             print("note: {:>3f} {:>3s} {:+.2f} {}".format(n, note, diff, decibel))
+        #main filter, must be close enough to a note we want, or be within the range for B flat as it struggles to detect those
         if ((abs(diff) < DIFF_CUTOFF and note != "N") or (n > B_FLAT_MIN and n < B_FLAT_MAX)):
+            #dont care about b flats on atheon
             if(note == "N"):
                 if(ATHEON):
                     continue
+                #must have been in B flat range, set note manually
                 note = "Bb"
             if (DEBUG == 2):
                 print("note: {:>3s} {:+.2f} {}".format(note, diff, decibel))
+            #add note to queue
             sequence.append(note)
+            #if we reach enough of the same note in the queue print it, don't print the same note again
             if ((sum(elem == note for elem in sequence)) == NOTES_IN_QUEUE_REQUIRED and last_printed_note!=note):
                 if(DEBUG != 0):
                     print("IF NOT DEBUG", note_to_location(note))
