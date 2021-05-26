@@ -4,8 +4,9 @@
 Huge thanks to [mzucker](https://github.com/mzucker/python-tuner) on GitHub for the note detection code. Also thanks to [u/brainstormcsgo](https://www.reddit.com/r/DestinyTheGame/comments/njo9zl/had_a_bunch_of_people_asking_if_you_have_perfect/) on reddit for mapping the notes to call outs.
 
 #### Requirements
-1. Python 3.6, PyAudio, NumPy.
-    - Has to be 3.6 as PyAudio hasn't been updated since. 
+1. [Python 3.6](https://www.python.org/downloads/release/python-360/), PyAudio, NumPy.
+    - Has to be 3.6 as PyAudio hasn't been updated since.
+    - Should work with any 3.6.x python version, but I have only tested on 3.6.0  
     - If you are new to python PyAudio and NumPy are python packages. To install them try running "pip install NAME", replacing NAME with the package name. If that fails google how to install python packages for your environment, or message me.
 1. Game audio as PC input.
     - I have written instructions for this if you are on PC, please checkout the PC Instructions file. 
