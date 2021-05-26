@@ -38,6 +38,6 @@ I'm not as keen on this one, as I don't like the application, and it works the s
 1. Within VoiceMeeter Click on menu, click system tray (so you can close the app), and run on windows startup (so you don't have to boot it everytime you boot D2)    
 1. Now when you run the script you should be able to select VoiceMeeter Output as an option 
    
-Both of these ways should then work, and once set up properly they should not require you to start any app or check any settings to hear your D2 audio as normal. 
+Both of these ways should work, and once set up properly they should not require you to start any app or check any settings to hear your D2 audio as normal. 
 
 I was able to route chrome through both of these, and was able to blast spotify as loud as possible through my standard output, and the script worked as it only received the YouTube video (which I could also hear).
