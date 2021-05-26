@@ -5,7 +5,7 @@ import pyaudio
 
 ATHEON = False
 
-#0 off, 1 prints all sounds, 2 prints those making it through your filters
+#0 off, 1 prints all sounds above decibel cutoff, 2 prints those making it through your filters for note accuracy
 DEBUG = 0
 
 #ignore notes below this volume
