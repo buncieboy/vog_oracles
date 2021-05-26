@@ -5,9 +5,13 @@ Huge thanks to [mzucker](https://github.com/mzucker/python-tuner) on GitHub for 
 
 #### Requirements
 1. Python 3.6, PyAudio, NumPy.
-    - Has to be 3.6 as PyAudio hasn't been updated since. If you are new to python PyAudio and NumPy are python packages. To install them try running "pip install NAME", replacing NAME with the package name. If that fails google how to install python packages for your environment, or message me.
+    - Has to be 3.6 as PyAudio hasn't been updated since. 
+    - If you are new to python PyAudio and NumPy are python packages. To install them try running "pip install NAME", replacing NAME with the package name. If that fails google how to install python packages for your environment, or message me.
 1. Game audio as PC input.
-    - I have written instructions for this if you are on PC, please checkout the PC Instructions file. On console I use my monitors output as an audio line in. I haven't tested using speakers from console and microphone, but it could work. Try to avoid routing VC with game audio, as this will make it harder to detect notes.
+    - I have written instructions for this if you are on PC, please checkout the PC Instructions file. 
+    - On console I use my monitors output as an audio line in. 
+    - I haven't tested using speakers from console and a microphone as input, but it could work.
+    - Try to avoid routing VC with game audio, as this will make it harder to detect notes.
 
 #### To use
 Set ATHEON constant to true if in Atheon room, false for oracles/templar. Run main.py. Your audio inputs will be listed numbered from 0 upwards, type the number for the audio input you want and press enter.
